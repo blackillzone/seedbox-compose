@@ -1,0 +1,64 @@
+version: '2'
+
+services:
+  consul:
+    container_name: consul
+    image: progrium/consul
+    environment:
+      - SERVICE_IGNORE=true
+    ports:
+      - 8400:8400
+      - 8600:53/udp
+      - 8500:8500
+    command: -server -bootstrap -node seedbox.example.xom
+
+  registrator:
+    container_name: registrator
+    image: gliderlabs/registrator
+    depends_on:
+      - consul
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock
+    command: consul://consul:8500
+
+  nginx:
+    container_name: nginx
+    image: shufo/nginx-consul-template
+    volumes:
+      - ./config.json:/config.json
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      - SERVICE_IGNORE=true
+      - CONSUL_KV_PREFIX=nginx
+      - CONSUL_PORT_8500_TCP_ADDR=consul
+    depends_on:
+      - consul
+
+  sonarr:
+    container_name: sonarr
+    image: linuxserver/sonarr
+    ports:
+      - 8989:8989
+    environment:
+      - SERVICE_NAME=sonarr
+      - SERVICE_TAGS=sonarr-01
+    depends_on:
+      - nginx
+
+  couchpotato:
+    container_name: couchpotato
+    image: linuxserver/couchpotato
+    ports:
+      - 5050:5050
+    depends_on:
+      - nginx
+
+  plex:
+    container_name: plex
+    image: linuxserver/plex
+    ports:
+      - 32400:32400
+    depends_on:
+      - nginx
