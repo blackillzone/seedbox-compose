@@ -1,5 +1,10 @@
 version: '2'
 
+networks:
+  default:
+    external:
+      name: seedbox
+
 services:
   consul:
     container_name: consul
@@ -7,10 +12,10 @@ services:
     environment:
       - SERVICE_IGNORE=true
     ports:
-      - 8400:8400
-      - 8600:53/udp
-      - 8500:8500
-    command: -server -bootstrap -node seedbox.example.xom
+      - localhost:8400:8400
+      - localhost:8600:53/udp
+      - localhost:8500:8500
+    command: -server -bootstrap -node seedbox.example.com
 
   registrator:
     container_name: registrator
@@ -40,25 +45,81 @@ services:
     container_name: sonarr
     image: linuxserver/sonarr
     ports:
-      - 8989:8989
+      - localhost:8989:8989
     environment:
       - SERVICE_NAME=sonarr
       - SERVICE_TAGS=sonarr-01
+    volumes:
+      - /dev/rtc:/dev/rtc:ro
+      - ./data/sonarr/config:/config
+      - ./data/tvshows:/tv
+      - ./data/transmission/tvshows:/downloads
     depends_on:
-      - nginx
+      - consul
 
   couchpotato:
     container_name: couchpotato
     image: linuxserver/couchpotato
     ports:
-      - 5050:5050
+      - localhost:5050:5050
+    environment:
+      - SERVICE_NAME=couchpotato
+      - SERVICE_TAGS=couchpotato-01
+      - TZ=Europe/Paris
+    volumes:
+      - ./data/couchpotato/config:/config
+      - ./data/movies:/movies
+      - ./data/transmission/movies:/downloads
     depends_on:
-      - nginx
+      - consul
 
   plex:
     container_name: plex
     image: linuxserver/plex
     ports:
-      - 32400:32400
+      - localhost:32400:32400
+      - localhost:32400:32400/udp
+      - localhost:32469:32469
+      - localhost:32469:32469/udp
+      # - localhost:5353:5353/udp
+      - localhost:1900:1900/udp
+    environment:
+      - SERVICE_32400_NAME=plex
+      - SERVICE_32400_TAGS=plex-01
+      - SERVICE_32469_IGNORE=true
+      - SERVICE_1900_IGNORE=true
+      - VERSION=public
+      - TZ=Europe/Paris
+    volumes:
+      - ./data/plex/config:/config
+      - ./data/tvshows:/data/tvshows
+      - ./data/movies:/data/movies
     depends_on:
-      - nginx
+      - consul
+
+  muximux:
+    container_name: muximux
+    image: linuxserver/muximux
+    ports:
+      - localhost:8080:8080
+    environment:
+      - SERVICE_8080_NAME=muximux
+      - SERVICE_TAGS=muximux-01
+      - TZ=Europe/Paris
+    volumes:
+      - ./data/muximux/config:/config
+    depends_on:
+      - consul
+
+  # glances:
+  #   container_name: glances
+  #   image: docker.io/nicolargo/glances
+  #   ports:
+  #     - 61208:61208
+  #   environment:
+  #     - SERVICE_61208_NAME=glances
+  #     - SERVICE_TAGS=glances-01
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #   depends_on:
+  #     - nginx

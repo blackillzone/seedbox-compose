@@ -29,11 +29,34 @@
     "server": {
       "sonarr": {
         "listen": "80",
-        "server_name": "localhost",
         "charset": "utf-8",
         "upstream": {
           "keepalive": "64",
           "current": "sonarr-01"
+        }
+      },
+      "couchpotato": {
+        "listen": "80",
+        "charset": "utf-8",
+        "upstream": {
+          "keepalive": "64",
+          "current": "couchpotato-01"
+        }
+      },
+      "plex": {
+        "listen": "80",
+        "charset": "utf-8",
+        "upstream": {
+          "keepalive": "64",
+          "current": "plex-01"
+        }
+      },
+      "muximux": {
+        "listen": "80",
+        "charset": "utf-8",
+        "upstream": {
+          "keepalive": "64",
+          "current": "muximux-01"
         }
       }
     }
