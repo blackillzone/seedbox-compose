@@ -111,15 +111,17 @@ services:
     depends_on:
       - consul
 
-  # glances:
-  #   container_name: glances
-  #   image: docker.io/nicolargo/glances
-  #   ports:
-  #     - 61208:61208
-  #   environment:
-  #     - SERVICE_61208_NAME=glances
-  #     - SERVICE_TAGS=glances-01
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock:ro
-  #   depends_on:
-  #     - nginx
+  glances:
+    container_name: glances
+    image: docker.io/nicolargo/glances
+    ports:
+      - 61208:61208
+    environment:
+      - SERVICE_61208_NAME=glances
+      - SERVICE_TAGS=glances-01
+      - GLANCES_OPT=-w
+    pid: "host"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - nginx

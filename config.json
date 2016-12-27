@@ -58,6 +58,14 @@
           "keepalive": "64",
           "current": "muximux-01"
         }
+      },
+      "glances": {
+        "listen": "80",
+        "charset": "utf-8",
+        "upstream": {
+          "keepalive": "64",
+          "current": "glances-01"
+        }
       }
     }
   }
