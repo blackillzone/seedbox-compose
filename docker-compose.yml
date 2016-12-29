@@ -57,13 +57,12 @@ services:
       - 127.0.0.1:8989:8989
     environment:
       - SERVICE_NAME=sonarr
-      - http_proxy=http://panoz4.fra.local:8081
-      - https_proxy=http://panoz4.fra.local:8081
     volumes:
       - /dev/rtc:/dev/rtc:ro
       - ./data/sonarr/config:/config
-      - ./data/tvshows:/tv
-      - ./data/transmission/tvshows:/downloads
+      - ./data/series:/tv
+      - ./data/transmission/series/.torrent:/torrents
+      - ./data/transmission/series:/downloads
     depends_on:
       - consul
 
@@ -75,11 +74,10 @@ services:
     environment:
       - SERVICE_NAME=couchpotato
       - TZ=Europe/Paris
-      - http_proxy=http://panoz4.fra.local:8081
-      - https_proxy=http://panoz4.fra.local:8081
     volumes:
       - ./data/couchpotato/config:/config
       - ./data/movies:/movies
+      - ./data/transmission/movies/.torrent:/torrents
       - ./data/transmission/movies:/downloads
     depends_on:
       - consul
@@ -96,11 +94,9 @@ services:
       - SERVICE_5353_IGNORE=true
       - VERSION=public
       - TZ=Europe/Paris
-      - http_proxy=http://panoz4.fra.local:8081
-      - https_proxy=http://panoz4.fra.local:8081
     volumes:
       - ./data/plex/config:/config
-      - ./data/tvshows:/data/tvshows
+      - ./data/series:/data/tvshows
       - ./data/movies:/data/movies
     depends_on:
       - consul
@@ -114,8 +110,6 @@ services:
       - SERVICE_80_NAME=muximux
       - SERVICE_443_IGNORE=true
       - TZ=Europe/Paris
-      - http_proxy=http://panoz4.fra.local:8081
-      - https_proxy=http://panoz4.fra.local:8081
     volumes:
       - ./data/muximux/config:/config
     depends_on:
@@ -130,10 +124,40 @@ services:
       - SERVICE_61208_NAME=glances
       - SERVICE_61209_IGNORE=true
       - GLANCES_OPT=-w
-      - http_proxy=http://panoz4.fra.local:8081
-      - https_proxy=http://panoz4.fra.local:8081
     pid: "host"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - nginx
+
+  transmission-series:
+    container_name: transmission-series
+    image: linuxserver/transmission
+    ports:
+      - 127.0.0.1:9091:9091
+    environment:
+      - SERVICE_9091_NAME=transmission-series
+      - SERVICE_51413_IGNORE=true
+      - TZ=Europe/Paris
+    volumes:
+      - ./data/transmission/series/.config:/config
+      - ./data/transmission/series/.torrent:/watch
+      - ./data/transmission/series:/downloads
+    depends_on:
+      - nginx
+
+  transmission-movies:
+    container_name: transmission-movies
+    image: linuxserver/transmission
+    ports:
+      - 127.0.0.1:9092:9091
+    environment:
+      - SERVICE_9091_NAME=transmission-movies
+      - SERVICE_51413_IGNORE=true
+      - TZ=Europe/Paris
+    volumes:
+      - ./data/transmission/movies/.config:/config
+      - ./data/transmission/movies/.torrent:/watch
+      - ./data/transmission/movies:/downloads
     depends_on:
       - nginx
