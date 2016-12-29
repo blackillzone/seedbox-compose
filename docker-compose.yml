@@ -8,14 +8,12 @@ networks:
 services:
   consul:
     container_name: consul
-    image: progrium/consul
+    image: consul
     environment:
       - SERVICE_IGNORE=true
     ports:
-      - localhost:8400:8400
-      - localhost:8600:53/udp
-      - localhost:8500:8500
-    command: -server -bootstrap -node seedbox.example.com
+      - 127.0.0.1:8500:8500
+    command: agent -server -bootstrap -node seedbox.example.com -client=0.0.0.0 -ui
 
   registrator:
     container_name: registrator
@@ -24,31 +22,43 @@ services:
       - consul
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock
-    command: consul://consul:8500
+    command: -internal consul://consul:8500
 
   nginx:
     container_name: nginx
-    image: shufo/nginx-consul-template
-    volumes:
-      - ./config.json:/config.json
+    image: nginx:stable-alpine
     ports:
       - 80:80
       - 443:443
+    volumes:
+      - ./data/nginx/conf:/etc/nginx/conf.d
     environment:
       - SERVICE_IGNORE=true
-      - CONSUL_KV_PREFIX=nginx
-      - CONSUL_PORT_8500_TCP_ADDR=consul
     depends_on:
       - consul
+
+  consul-template:
+    container_name: consul-template
+    image: blackillzone/consul-template:1.11
+    volumes:
+      - ./consul-templates:/templates
+      - ./data/nginx/conf:/conf/nginx
+      - ./data/muximux/config/www/muximux:/conf/muximux
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+    command: -wait=5s -retry 30s -consul consul:8500 -template "/templates/default.ctmpl:/conf/nginx/default.conf:docker kill -s HUP nginx" -template "/templates/settings.ctmpl:/conf/muximux/settings.ini.php:docker restart muximux"
+    depends_on:
+      - nginx
 
   sonarr:
     container_name: sonarr
     image: linuxserver/sonarr
     ports:
-      - localhost:8989:8989
+      - 127.0.0.1:8989:8989
     environment:
       - SERVICE_NAME=sonarr
-      - SERVICE_TAGS=sonarr-01
+      - http_proxy=http://panoz4.fra.local:8081
+      - https_proxy=http://panoz4.fra.local:8081
     volumes:
       - /dev/rtc:/dev/rtc:ro
       - ./data/sonarr/config:/config
@@ -61,11 +71,12 @@ services:
     container_name: couchpotato
     image: linuxserver/couchpotato
     ports:
-      - localhost:5050:5050
+      - 127.0.0.1:5050:5050
     environment:
       - SERVICE_NAME=couchpotato
-      - SERVICE_TAGS=couchpotato-01
       - TZ=Europe/Paris
+      - http_proxy=http://panoz4.fra.local:8081
+      - https_proxy=http://panoz4.fra.local:8081
     volumes:
       - ./data/couchpotato/config:/config
       - ./data/movies:/movies
@@ -77,19 +88,16 @@ services:
     container_name: plex
     image: linuxserver/plex
     ports:
-      - localhost:32400:32400
-      - localhost:32400:32400/udp
-      - localhost:32469:32469
-      - localhost:32469:32469/udp
-      # - localhost:5353:5353/udp
-      - localhost:1900:1900/udp
+      - 127.0.0.1:32400:32400
     environment:
       - SERVICE_32400_NAME=plex
-      - SERVICE_32400_TAGS=plex-01
       - SERVICE_32469_IGNORE=true
       - SERVICE_1900_IGNORE=true
+      - SERVICE_5353_IGNORE=true
       - VERSION=public
       - TZ=Europe/Paris
+      - http_proxy=http://panoz4.fra.local:8081
+      - https_proxy=http://panoz4.fra.local:8081
     volumes:
       - ./data/plex/config:/config
       - ./data/tvshows:/data/tvshows
@@ -101,11 +109,13 @@ services:
     container_name: muximux
     image: linuxserver/muximux
     ports:
-      - localhost:8080:8080
+      - 127.0.0.1:8080:80
     environment:
-      - SERVICE_8080_NAME=muximux
-      - SERVICE_TAGS=muximux-01
+      - SERVICE_80_NAME=muximux
+      - SERVICE_443_IGNORE=true
       - TZ=Europe/Paris
+      - http_proxy=http://panoz4.fra.local:8081
+      - https_proxy=http://panoz4.fra.local:8081
     volumes:
       - ./data/muximux/config:/config
     depends_on:
@@ -115,11 +125,13 @@ services:
     container_name: glances
     image: docker.io/nicolargo/glances
     ports:
-      - 61208:61208
+      - 127.0.0.1:61208:61208
     environment:
       - SERVICE_61208_NAME=glances
-      - SERVICE_TAGS=glances-01
+      - SERVICE_61209_IGNORE=true
       - GLANCES_OPT=-w
+      - http_proxy=http://panoz4.fra.local:8081
+      - https_proxy=http://panoz4.fra.local:8081
     pid: "host"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro

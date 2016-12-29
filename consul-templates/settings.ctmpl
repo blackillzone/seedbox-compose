@@ -1,0 +1,50 @@
+; <?php die("Access denied"); ?>
+[general]
+title = "Muximux - Application Management Console"
+branch = "master"
+enabledropdown = "true"
+
+[settings]
+enabled = "true"
+default = "false"
+name = "Settings"
+url = "settings.php"
+landingpage = "false"
+icon = "fa fa-cog"
+dd = "true"
+
+{{ range services }}{{ $name := .Name }}{{ if eq .Name "consul" }}{{ else if eq .Name "muximux" }}{{ else if eq .Name "couchpotato" }}
+[{{ $name }}]
+name = "Couchpotato"
+url = "http://{{ $name }}.{{ key_or_default "dns_entry" "domain.local" }}"
+icon = "fa-desktop"
+enabled = "true"
+default = "true"
+landingpage = "false"
+dd = "false"{{ else if eq .Name "sonarr" }}
+[{{ $name }}]
+name = "Sonarr"
+url = "http://{{ $name }}.{{ key_or_default "dns_entry" "domain.local" }}"
+icon = "fa-calendar"
+enabled = "true"
+default = "false"
+landingpage = "false"
+dd = "false"{{ else if eq .Name "glances" }}
+[{{ $name }}]
+name = "Glances"
+url = "http://{{ $name }}.{{ key_or_default "dns_entry" "domain.local" }}"
+icon = "fa-dashboard"
+enabled = "true"
+default = "false"
+landingpage = "false"
+dd = "false"{{ else if eq .Name "plex" }}
+[{{ $name }}]
+name = "Plex"
+url = "http://{{ $name }}.{{ key_or_default "dns_entry" "domain.local" }}"
+icon = "fa-play-circle"
+enabled = "true"
+default = "false"
+landingpage = "false"
+dd = "false"
+{{ end }}
+{{ end }}
