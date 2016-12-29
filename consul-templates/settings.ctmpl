@@ -45,6 +45,22 @@ icon = "fa-play-circle"
 enabled = "true"
 default = "false"
 landingpage = "false"
+dd = "false"{{ else if eq .Name "transmission-series" }}
+[{{ $name }}]
+name = "Series Torrent"
+url = "http://{{ $name }}.{{ key_or_default "dns_entry" "domain.local" }}"
+icon = "fa-download"
+enabled = "true"
+default = "false"
+landingpage = "false"
+dd = "false"{{ else if eq .Name "transmission-movies" }}
+[{{ $name }}]
+name = "Movies Torrent"
+url = "http://{{ $name }}.{{ key_or_default "dns_entry" "domain.local" }}"
+icon = "fa-download"
+enabled = "true"
+default = "false"
+landingpage = "false"
 dd = "false"
 {{ end }}
 {{ end }}

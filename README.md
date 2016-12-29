@@ -1,11 +1,13 @@
 Simple docker-compose to start different services for a seedbox
 
+Prequisites:
+-   docker-compose
+-   docker
+-   jq
+
 TODO:
 -   Add plexpy
 -   Add plex requests
--   Add transmission (one for tvshows and one for movies, more => music/comics…)
--   Simplify configuration/automatisation via consul => use official nginx image (more updates, and maintain) + consul-template
--   Adding https conf (certbot), and a way to automate it
 -   Variabilise the data path
 
 The default domain names will be the service name in consul =>related to the docker container name.

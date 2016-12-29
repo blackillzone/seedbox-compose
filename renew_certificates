@@ -1,0 +1,18 @@
+#!/bin/bash
+
+function renew_certificates() {
+  docker run --rm -v "$(pwd)/data/nginx/certs:/etc/letsencrypt" --net=host -t deliverous/certbot certonly renew
+  docker run --rm -v "$(pwd)/data/nginx/certs:/certs" -t jordi/openssl-ca openssl dhparam -out /certs/dhparam.pem 2048
+}
+
+function stop_nginx() {
+  docker stop nginx
+}
+
+function start_nginx() {
+  docker start nginx
+}
+
+stop_nginx
+renew_certificates
+start_nginx
