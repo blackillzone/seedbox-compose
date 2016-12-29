@@ -98,7 +98,7 @@ check_docker
 check_dockercompose
 start_seedbox
 stop_nginx
+config_hostname
 generate_certificates
 start_nginx
-config_hostname
 setup_renew
