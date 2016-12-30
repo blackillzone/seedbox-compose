@@ -35,6 +35,7 @@ Launch the setup.sh, and follow the instructions. All is automated, but you need
 -   Add more security (fail2ban, filter by ip, basic auth via nginx ?)
 -   Permit to user to change the data path (at least movies/series)
 -   Open transmission ports (UDP)
+-   Better handling of certs (using SAN, instead of one cert per domain ?)
 
 Inspired by: <https://github.com/caseyWebb/seedbox>
 
