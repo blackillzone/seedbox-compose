@@ -16,7 +16,7 @@ dd = "true"
 {{ range services }}{{ $name := .Name }}{{ if eq .Name "consul" }}{{ else if eq .Name "muximux" }}{{ else if eq .Name "couchpotato" }}
 [{{ $name }}]
 name = "Couchpotato"
-url = "http://{{ $name }}.{{ key_or_default "dns_entry" "domain.local" }}"
+url = "https://{{ $name }}.{{ key_or_default "dns_entry" "domain.local" }}"
 icon = "fa-desktop"
 enabled = "true"
 default = "true"
@@ -24,7 +24,7 @@ landingpage = "false"
 dd = "false"{{ else if eq .Name "sonarr" }}
 [{{ $name }}]
 name = "Sonarr"
-url = "http://{{ $name }}.{{ key_or_default "dns_entry" "domain.local" }}"
+url = "https://{{ $name }}.{{ key_or_default "dns_entry" "domain.local" }}"
 icon = "fa-calendar"
 enabled = "true"
 default = "false"
@@ -32,7 +32,7 @@ landingpage = "false"
 dd = "false"{{ else if eq .Name "glances" }}
 [{{ $name }}]
 name = "Glances"
-url = "http://{{ $name }}.{{ key_or_default "dns_entry" "domain.local" }}"
+url = "https://{{ $name }}.{{ key_or_default "dns_entry" "domain.local" }}"
 icon = "fa-dashboard"
 enabled = "true"
 default = "false"
@@ -40,7 +40,7 @@ landingpage = "false"
 dd = "false"{{ else if eq .Name "plex" }}
 [{{ $name }}]
 name = "Plex"
-url = "http://{{ $name }}.{{ key_or_default "dns_entry" "domain.local" }}"
+url = "https://{{ $name }}.{{ key_or_default "dns_entry" "domain.local" }}"
 icon = "fa-play-circle"
 enabled = "true"
 default = "false"
@@ -48,7 +48,7 @@ landingpage = "false"
 dd = "false"{{ else if eq .Name "transmission-series" }}
 [{{ $name }}]
 name = "Series Torrent"
-url = "http://{{ $name }}.{{ key_or_default "dns_entry" "domain.local" }}"
+url = "https://{{ $name }}.{{ key_or_default "dns_entry" "domain.local" }}"
 icon = "fa-download"
 enabled = "true"
 default = "false"
@@ -56,7 +56,7 @@ landingpage = "false"
 dd = "false"{{ else if eq .Name "transmission-movies" }}
 [{{ $name }}]
 name = "Movies Torrent"
-url = "http://{{ $name }}.{{ key_or_default "dns_entry" "domain.local" }}"
+url = "https://{{ $name }}.{{ key_or_default "dns_entry" "domain.local" }}"
 icon = "fa-download"
 enabled = "true"
 default = "false"
